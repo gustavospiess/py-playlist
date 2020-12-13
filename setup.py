@@ -7,7 +7,7 @@ setuptools.setup(
     name="gustavospiess",
     version="0.0.1",
     author="Gustavo Henrique Spiess",
-    author_email="gustavospiess@gmail",
+    author_email="gustavospiess@gmail.com",
     description="A playlist manager for terminal based players",
     long_description=long_description,
     long_description_content_type="text/markdown",
