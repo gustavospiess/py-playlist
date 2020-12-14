@@ -5,12 +5,14 @@ import os
 
 
 import utils
-import logs
 import config
 import playlist
 
 
-@logs.log_function
+from logs import log_function, start_logs
+
+
+@log_function
 def validate_dir_list(path_list):
     validated = []
     for path in path_list:
@@ -18,7 +20,7 @@ def validate_dir_list(path_list):
         if os.path.isdir(expanded):
             validated.append(expanded)
         else:
-            logs.logging.error(f'dir {path} is not valid')
+            logging.error(f'dir {path} is not valid')
     return validated
 
 
@@ -55,13 +57,13 @@ def main(config_path, playlist_path, editor, player, save_config,
     receive some parameters to change the behavior, calling different players
     and file editors.
     '''
-    logs.start_logs(log_level)
+    start_logs(log_level)
 
     cleaned_music_path = validate_dir_list(music_path_list)
     cleaned_path_add = validate_dir_list(music_path_add)
 
     if len(music_path_list) > 0 and len(cleaned_music_path) == 0 and len(cleaned_path_add) == 0:
-        logs.logging.critical(f'no music dir is valid')
+        logging.critical(f'no music dir is valid')
 
     config.config_init(config_path, playlist_path, cleaned_music_path, music_path_add, editor,
         player, save_config, force_default)

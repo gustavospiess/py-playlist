@@ -1,13 +1,12 @@
 import os
 
-
-import logs
+from logs import log_function
 
 
 __version__ = '0.0.1'
 
 
-@logs.log_function
+@log_function
 def expand_path(path):
     user_expanded = os.path.expanduser(path)
     vars_expanded = os.path.expandvars(user_expanded)

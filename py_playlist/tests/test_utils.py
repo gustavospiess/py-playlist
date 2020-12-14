@@ -7,3 +7,7 @@ def test_version_defined():
 
 def test_expand_path():
     assert utils.expand_path('~') != '~'
+
+
+def test_fstr():
+    assert f'a{1+2}' == 'a3'
