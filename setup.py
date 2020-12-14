@@ -4,8 +4,8 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="gustavospiess",
-    version="0.0.1",
+    name="py_playlist",
+    version="0.0.2",
     author="Gustavo Henrique Spiess",
     author_email="gustavospiess@gmail.com",
     description="A playlist manager for terminal based players",

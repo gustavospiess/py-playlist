@@ -3,7 +3,7 @@ import os
 from logs import log_function
 
 
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 
 
 @log_function
