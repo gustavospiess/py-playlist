@@ -10,7 +10,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="py_playlist",
-    version="0.0.2",
+    version="0.0.3",
     author="Gustavo Henrique Spiess",
     author_email="gustavospiess@gmail.com",
     description="A playlist manager for terminal based players",
