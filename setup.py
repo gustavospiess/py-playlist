@@ -19,4 +19,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.6',
+    package_data={"": ["LICENSE", "README.rst", "CHANGELOG"]},
+    install_requires=['click>=7.1.2', 'click-aliases>=1.0.1'],
+    entry_points={'console_scripts': ['pypl = py_playlist:__main__']},
 )

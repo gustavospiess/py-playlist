@@ -8,76 +8,51 @@ import logs
 
 import pprint
 
-_config = None
 _config_path = None
+_config = None
 
 class Configurations(tp.NamedTuple):
-    playlist_path: str
-    music_path_list: tp.Optional[tp.List[str]]
-    editor: str
-    player: str
+    playlist_path: str = utils.normalize_config_path(None)
+    music_path_list: tp.Optional[tp.List[str]] = utils.default_music_path()
+    editor: str = os.environ.get('EDITOR', 'vim')
+    player: str = 'mpv'
+    player_args: tp.List[str] = []
+    editor_args: tp.List[str] = []
     version: str = utils.__version__
 
 
-@logs.log_function
-def __normalize_config_path(config_path = None):
-    ''' Get user's configuration directory.'''
-    if config_path is None:
-        if os.name == 'nt':
-            confdir = os.environ['APPDATA']
+def assert_config(config):
+    '''
+    asserts configuration values tu avoid shell injection attacks
+    '''
+    if ' ' in config.editor:
+        raise Exception('Space char in editor configuration, pleas use the `editor_args` to parametrize the editor')
 
-        elif 'XDG_CONFIG_HOME' in os.environ:
-            confdir = os.environ['XDG_CONFIG_HOME']
-        else: confdir = os.path.join(os.path.expanduser('~'), '.config')
+    if ' ' in config.player:
+        raise Exception('Space char in player configuration, pleas use the `player_args` to parametrize the player') 
 
-        config_path = os.path.join(confdir, 'py-playlist')
-
-    os.makedirs(config_path, exist_ok=True)
-
-    return config_path
 
 @logs.log_function
 def main_conf_path(config_path):
-    return os.path.join(config_path, 'main_conf.json')
-
-
-@logs.log_generator
-def dir_combinations():
-    for name in ('Music', 'Musica', 'Download'):
-        lower = name.lower()
-        yield lower
-        yield lower + 's'
-        upper = name.upper()
-        yield upper
-        yield upper + 'S'
-        if len(name) > 1:
-            yield upper[0] + lower[1:]
-            yield upper[0] + lower[1:] + 's'
+    if os.path.isdir(config_path):
+        return os.path.join(config_path, 'main_conf.json')
+    return config_path
 
 
 @logs.log_function
-def default_music_path():
-    base = dir_combinations()
-    base = (f'~/{n}/' for n in base)
-    path_list = []
-    for path in base:
-        user_expanded = os.path.expanduser(path)
-        vars_expanded = os.path.expandvars(user_expanded)
-        abs_path = os.path.abspath(vars_expanded)
-        if os.path.isdir(abs_path):
-            logs.logging.info(f'found music dir as {abs_path}')
-            path_list.append(abs_path)
-        logs.logging.info(f'{abs_path} is not a music dir')
-    return path_list
+def default_config(config_path, **kwargs):
+    '''
+    default_config(config_path, **kwargs)
 
-@logs.log_function
-def default_config(config_path, playlist_path, editor, player):
-    config = Configurations(
-            playlist_path = playlist_path or config_path,
-            music_path_list = default_music_path(),
-            editor = editor or os.environ.get('EDITOR', 'vim'),
-            player = player or 'mpv'
-        )
+    Build up new configuration objetct, may receive any configuration field in
+    the kwargs.
+
+    The `config_path` must be informed to set a default `playlist_path` in the
+    configuration, as it has no default value by itself.
+    '''
+    kwargs.setdefault('playlist_path', config_path)
+    parameters = {key: value for key, value in kwargs.items() if value}
+    config = Configurations(**parameters)
     return config
 
 
@@ -95,24 +70,30 @@ def write_config(config, config_path):
         json.dump(obj, file_buf, indent=4, sort_keys=True)
 
 @logs.log_function
-def update_config(config, playlist_path, music_path_list, music_path_add, editor, player):
+def update_config(config, music_path_list, music_path_add, **kwargs):
     obj = config._asdict()
-    if playlist_path:
-        obj['playlist_path'] = playlist_path
-    if editor:
-        obj['editor'] = editor
-    if player:
-        obj['player'] = player
+
     if music_path_list:
         obj['music_path_list'] = music_path_list
     if music_path_add:
         obj.setdefault('music_path_list', [])
         obj['music_path_list'] = tuple(( *music_path_add, *obj['music_path_list'] ))
+
+    parameters = {key: value for key, value in kwargs.items() if value}
+    obj.update(parameters)
+
+    if isinstance(obj['player_args'], str):
+        obj['player_args'] = obj['player_args'].split(' ')
+
+    if isinstance(obj['editor_args'], str):
+        obj['editor_args'] = obj['editor_args'].split(' ')
+
     return Configurations(**obj)
 
 @logs.log_function
-def config_init(config_path, playlist_path, music_path_list, music_path_add, editor, player, save_config, force_default):
-    config_path = __normalize_config_path(config_path)
+def config_init(config_path, save_config, force_default, music_path_list, music_path_add, **kwargs):
+
+    config_path = utils.normalize_config_path(config_path)
     global _config_path
     _config_path = config_path
 
@@ -123,32 +104,34 @@ def config_init(config_path, playlist_path, music_path_list, music_path_add, edi
     logs.logging.info(f'main config file is {main_conf_file}')
 
     if force_default:
-        logs.logging.debug(f'forced default configurations')
-        config = default_config(config_path, playlist_path, editor, player)
+        logs.logging.debug(f'forced default configurations, re initializing with default values')
+        config = default_config(config_path, **kwargs)
     elif not os.path.isfile(main_conf_file):
-        logs.logging.debug(f'main config file do not exists')
-        config = default_config(config_path, playlist_path, editor, player)
+        logs.logging.debug(f'main configuration file do not exists, initializing with default values')
+        config = default_config(config_path, **kwargs)
     else:
-        logs.logging.debug(f'main config file exists, loading')
+        logs.logging.debug(f'main configuration file exists, loading')
         config = load_config(config_path)
-    logs.logging.info(f'loaded config {config}')
+    logs.logging.info(f'loaded configuration {str(config)}')
 
-    config = update_config(config, playlist_path, music_path_list,
-            music_path_add, editor, player)
-    logs.logging.info(f'updated config to {config}')
+    config = update_config(config, music_path_list, music_path_add, **kwargs)
+    logs.logging.info(f'updated configuration to {str(config)}')
 
     if save_config:
-        logs.logging.debug('saveing config')
+        logs.logging.debug('saving configurations into path {config_path}')
         write_config(config, config_path)
+
+    assert_config(config)
 
     global _config
     _config = config
+
 
 @logs.log_function
 def edit_config(config_path):
     dir_path = _config_path
     if config_path:
-        dir_path = __normalize_config_path(config_path)
+        dir_path = utils.normalize_config_path(config_path)
     
     path = main_conf_path(dir_path)
 
@@ -156,14 +139,14 @@ def edit_config(config_path):
         logs.logging.critical(f'file do not exists')
         return
     
-    subprocess.call([_config.editor, path])
+    utils.call(_config.editor, *_config.editor_args, path)
 
 
 @logs.log_function
 def show_config(config_path):
     config = None
     if config_path:
-        dir_path = __normalize_config_path(config_path)
+        dir_path = utils.normalize_config_path(config_path)
         path = main_conf_path(dir_path)
         if not os.path.isfile(path):
             logs.logging.critical(f'file do not exists')

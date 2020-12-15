@@ -28,6 +28,9 @@ def validate_dir_list(path_list):
 @click.option('--config_path', '--config', '-c', default=None, help='''set a configuration directory to be considered''')
 @click.option('--playlist_path', '--playlist', '-l', default=None, help='''set the playplist dir for one run''')
 @click.option('--editor', '-e', default=None, help='''set the editor for one run''')
+@click.option('--editor_args', '--eargs', default=None, help='''set the editor arguments, to parametrize its call''')
+@click.option('--player', '-p', default=None, help='''set the player for one run''')
+@click.option('--player_args', '--pargs', default=None, help='''set the player arguments, to parametrize its call''')
 @click.option('--music_path', '--music', '-m', 'music_path_list', multiple=True, default=None, help='''set the
         music dir for one run
 
@@ -38,7 +41,6 @@ def validate_dir_list(path_list):
 
         This option can be called multiple times and it will not erase previous
         music paths''')
-@click.option('--player', '-p', default=None, help='''set the player for one run''')
 @click.option('--save_config/', '--save/', '-s/-S', help='''updates the config with the parameters provided in this call''')
 @click.option('--force_default/', '--default/', '-d/-D', help='''loads the
         default configuration''')
@@ -47,9 +49,9 @@ def validate_dir_list(path_list):
 @click.option('--warning', 'log_level', flag_value=logging.WARNING, help='''set the log level to warning''')
 @click.option('--error', 'log_level', flag_value=logging.ERROR, help='''set the log level to error''')
 @click.version_option(utils.__version__)
-def main(config_path, playlist_path, editor, player, save_config,
+def main(config_path, save_config,
         force_default, log_level=logging.CRITICAL, music_path_list=[],
-        music_path_add=[]):
+        music_path_add=[], **kwargs):
     '''
     Entry point to py_playlist
 
@@ -64,9 +66,9 @@ def main(config_path, playlist_path, editor, player, save_config,
 
     if len(music_path_list) > 0 and len(cleaned_music_path) == 0 and len(cleaned_path_add) == 0:
         logging.critical(f'no music dir is valid')
+        raise Exception('No valid music path')
 
-    config.config_init(config_path, playlist_path, cleaned_music_path, music_path_add, editor,
-        player, save_config, force_default)
+    config.config_init(config_path, save_config, force_default, cleaned_music_path, cleaned_path_add, **kwargs)
 
 
 @main.command(aliases=['ed', 'e'])

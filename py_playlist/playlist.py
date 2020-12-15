@@ -1,5 +1,4 @@
 import os
-import subprocess
 import random
 import pprint
 
@@ -20,7 +19,7 @@ def edit(playlist_name):
     '''
     if len(config._config.music_path_list):
         os.chdir(config._config.music_path_list[0])
-    subprocess.call([config._config.editor, playlist_path(playlist_name)])
+    utils.call(config._config.editor, config._config.editor_args, playlist_path(playlist_name))
 
 
 @logs.log_generator
@@ -59,7 +58,7 @@ def play(playlist_name, shuffle):
             logs.logging.debug(f'shuffle songs')
             random.shuffle(norm)
 
-        subprocess.call([config._config.player, *norm])
+        utils.call(config._config.player, config._config.player_args, *norm)
 
 
 def list_():
