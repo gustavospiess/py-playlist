@@ -1,4 +1,4 @@
-import py_playlist.utils as utils
+from .. import utils
 
 
 def test_version_defined():

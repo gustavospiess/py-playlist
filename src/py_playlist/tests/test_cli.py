@@ -1,4 +1,4 @@
-import py_playlist.cli as cli
+from .. import cli
 
 def test_main_cli_doc():
     assert len(cli.main.__doc__) > 100

@@ -4,12 +4,10 @@ import logging
 import os
 
 
-import utils
-import config
-import playlist
-
-
-from logs import log_function, start_logs
+from . import utils
+from . import config
+from . import playlist
+from .logs import log_function, start_logs
 
 
 @log_function

@@ -1,4 +1,4 @@
-import py_playlist.logs as logs
+from .. import logs
 
 
 def test_function_decorator():

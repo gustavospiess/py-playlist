@@ -2,10 +2,9 @@ import os
 import random
 import pprint
 
-import config
-import logs
-
-import utils
+from . import config
+from . import logs
+from . import utils
 
 @logs.log_function
 def playlist_path(playlist_name):

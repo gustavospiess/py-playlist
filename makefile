@@ -1,6 +1,7 @@
 .PHONY: build test publish depend
 
 build:
+	rm dist/*
 	python setup.py sdist bdist_wheel
 
 publish:

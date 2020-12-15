@@ -2,11 +2,10 @@ import typing as tp
 import os
 import subprocess
 import json
-
-import utils
-import logs
-
 import pprint
+
+from . import utils
+from . import logs
 
 _config_path = None
 _config = None

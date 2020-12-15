@@ -2,8 +2,8 @@ import tempfile
 import random
 import os
 
-import py_playlist.config as config
-import py_playlist.cli as cli
+from .. import config
+from .. import cli
 
 def test_shell_injection_prevention(cli_runner):
     try:

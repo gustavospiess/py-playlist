@@ -3,6 +3,11 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+
+# print(setuptools.find_packages('py_playlist'))
+# print(setuptools.find_packages('src'))
+# raise Exception()
+
 setuptools.setup(
     name="py_playlist",
     version="0.0.2",
@@ -12,7 +17,9 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/gustavospiess/py-playlist",
-    packages=setuptools.find_packages(),
+    package_dir={'':'src'},
+    # packages=setuptools.find_packages('py_playlist'),
+    packages=['py_playlist'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
@@ -21,5 +28,10 @@ setuptools.setup(
     python_requires='>=3.6',
     package_data={"": ["LICENSE", "README.rst", "CHANGELOG"]},
     install_requires=['click>=7.1.2', 'click-aliases>=1.0.1'],
-    entry_points={'console_scripts': ['pypl = py_playlist:__main__']},
+    entry_points={
+        'console_scripts': [
+            'py_playlist=py_playlist.__main__:main',
+            'ppl=py_playlist.__main__:main',
+        ],
+    },
 )

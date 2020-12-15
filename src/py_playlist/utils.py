@@ -1,10 +1,12 @@
 import os
 
-import logs
 import subprocess
 
+from . import logs
+from . import __version__
 
-__version__ = '0.0.2'
+
+# __version__ = '0.0.2'
 
 
 @logs.log_function
