@@ -7,6 +7,7 @@ import os
 from . import utils
 from . import config
 from . import playlist
+from . import __version__
 from .logs import log_function, start_logs
 
 
@@ -46,7 +47,7 @@ def validate_dir_list(path_list):
 @click.option('--info', 'log_level', flag_value=logging.INFO, help='''set the log level to info''')
 @click.option('--warning', 'log_level', flag_value=logging.WARNING, help='''set the log level to warning''')
 @click.option('--error', 'log_level', flag_value=logging.ERROR, help='''set the log level to error''')
-@click.version_option(utils.__version__)
+@click.version_option(__version__)
 def main(config_path, save_config,
         force_default, log_level=logging.CRITICAL, music_path_list=[],
         music_path_add=[], **kwargs):

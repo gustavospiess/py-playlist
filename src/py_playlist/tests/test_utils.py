@@ -1,8 +1,9 @@
 from .. import utils
+from .. import __version__
 
 
 def test_version_defined():
-    assert utils.__version__ is not None
+    assert __version__ is not None
 
 
 def test_expand_path():

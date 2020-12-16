@@ -3,11 +3,7 @@ import os
 import subprocess
 
 from . import logs
-from . import __version__
-
-
-# __version__ = '0.0.2'
-
+from . import _white_listed_for_call
 
 @logs.log_function
 def expand_path(path):
@@ -82,7 +78,7 @@ def normalize_config_path(config_path = None):
 
 @logs.log_function
 def call(command, *args):
-    if ' ' in command:
-        logs.logging.critical(f'the comand "{command}" contains a space in it')
+    if command not in _white_listed_for_call:
+        logs.logging.critical(f'the comand "{command}" not white listed')
         raise Exception(f'unsafe call to command "{command}"')
     return subprocess.call([command, *args])

@@ -6,9 +6,12 @@ import pprint
 
 from . import utils
 from . import logs
+from . import __version__, _white_listed_for_call
+
 
 _config_path = None
 _config = None
+
 
 class Configurations(tp.NamedTuple):
     playlist_path: str = utils.normalize_config_path(None)
@@ -17,18 +20,18 @@ class Configurations(tp.NamedTuple):
     player: str = 'mpv'
     player_args: tp.List[str] = []
     editor_args: tp.List[str] = []
-    version: str = utils.__version__
+    version: str = __version__
 
 
 def assert_config(config):
     '''
     asserts configuration values tu avoid shell injection attacks
     '''
-    if ' ' in config.editor:
-        raise Exception('Space char in editor configuration, pleas use the `editor_args` to parametrize the editor')
+    if config.editor not in _white_listed_for_call:
+        raise Exception('Editor command not in white list')
 
-    if ' ' in config.player:
-        raise Exception('Space char in player configuration, pleas use the `player_args` to parametrize the player') 
+    if config.player not in _white_listed_for_call:
+        raise Exception('Player command not in white list') 
 
 
 @logs.log_function

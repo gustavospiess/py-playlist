@@ -67,6 +67,30 @@ def test_shell_injection_prevention(cli_runner):
     result = cli_runner.invoke(cli.main, ['-d', '-p', 'vlc'])
     assert result.exit_code == 0
 
+    try:
+        config.config_init(
+            config_path=None,
+            save_config=False,
+            force_default=True,
+            music_path_list=[],
+            music_path_add=[],
+            player='rm')
+        assert False
+    except:
+        assert True
+
+    try:
+        config.config_init(
+            config_path=None,
+            save_config=False,
+            force_default=True,
+            music_path_list=[],
+            music_path_add=[],
+            player='sh')
+        assert False
+    except:
+        assert True
+
 
 def test_file_saving():
     with tempfile.NamedTemporaryFile(mode='r') as temp_buf:
