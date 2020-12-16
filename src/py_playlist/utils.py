@@ -81,4 +81,6 @@ def call(command, *args):
     if command not in _white_listed_for_call:
         logs.logging.critical(f'the comand "{command}" not white listed')
         raise Exception(f'unsafe call to command "{command}"')
+    args_repr = ' '.join(args)
+    logs.logging.debug(f'calling command {command} with the folowing args\n{args_repr}')
     return subprocess.call([command, *args])
